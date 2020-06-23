@@ -198,5 +198,70 @@ namespace TabloidMVC.Repositories
                 }
             };
         }
+
+        public void DeletePost(int postId)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                            DELETE FROM Post
+                            WHERE Id = @id";
+
+                    cmd.Parameters.AddWithValue("@id", postId);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void UpdatePost(Post post)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                               UPDATE Post
+                               SET
+                                    Title = @Title,
+                                    Content = @Content,
+                                    ImageLocation = @ImageLocation,
+                                    PublishDateTime = @PublishDateTime,
+                                    CategoryId = @CategoryId
+                                WHERE Id = @id";
+
+                    cmd.Parameters.AddWithValue("@Title", post.Title);
+                    cmd.Parameters.AddWithValue("@Content", post.Content);
+                    cmd.Parameters.AddWithValue("@CategoryId", post.CategoryId);
+                    cmd.Parameters.AddWithValue("@id", post.Id);
+
+                    if (post.PublishDateTime == null)
+                    {
+                        cmd.Parameters.AddWithValue("@PublishDateTime", DBNull.Value);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@PublishDateTime", post.PublishDateTime);
+                    }
+
+                    if (post.ImageLocation == null)
+                    {
+                        cmd.Parameters.AddWithValue("@ImageLocation", DBNull.Value);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@ImageLocation", post.ImageLocation);
+                    }
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
     }
 }

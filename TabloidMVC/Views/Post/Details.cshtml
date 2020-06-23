@@ -16,7 +16,7 @@
                 <p class="text-black-50">Published on @Html.DisplayFor(model => model.PublishDateTime)</p>
             </div>
             <div class="row">
-                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary mx-1" title="Edit">
+                <a asp-action="Update" asp-route-id="@Model.Id" class="btn btn-outline-primary mx-1" title="Update">
                     <i class="fas fa-pencil-alt"></i>
                 </a>
                 <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-primary mx-1" title="Delete">

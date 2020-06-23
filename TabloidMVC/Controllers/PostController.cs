@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualBasic;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -37,7 +38,7 @@ namespace TabloidMVC.Controllers
             var myPosts = new List<Post>();
             foreach(Post post in posts)
             {
-                if (post.UserProfileId == GetCurrentUserId())
+                if (post.UserProfileId == GetCurrentUserProfileId())
                 {
                     myPosts.Add(post);
                 }       
@@ -94,11 +95,63 @@ namespace TabloidMVC.Controllers
             return int.Parse(id);
         }
 
-        private int GetCurrentUserId()
+        [Authorize]
+        public IActionResult Delete(int id)
         {
-            string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return int.Parse(id);
+            Post post = _postRepository.GetPublisedPostById(id);
+
+            if(post == null || post.UserProfileId != GetCurrentUserProfileId())
+            {
+                return NotFound();
+            }
+
+            return View(post);
         }
 
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(int id, Post post)
+        {
+            try
+            {
+                _postRepository.DeletePost(id);
+                return RedirectToAction("Index");
+            }
+            catch
+            {
+                return View(post);
+            }
+        }
+
+        [Authorize]
+        public IActionResult Update(int id)
+        {
+            Post post = _postRepository.GetPublisedPostById(id);
+
+            if (post == null || post.UserProfileId != GetCurrentUserProfileId())
+            {
+                return NotFound();
+            }
+
+            return View(post);
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Update(int id, Post post)
+        {
+            try
+            {
+                _postRepository.UpdatePost(post);
+
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                return View(post);
+            }
+        }
     }
 }
