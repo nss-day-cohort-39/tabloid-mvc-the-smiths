@@ -2,7 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualBasic;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
+using TabloidMVC.Models;
 using TabloidMVC.Models.ViewModels;
 using TabloidMVC.Repositories;
 
@@ -22,8 +25,25 @@ namespace TabloidMVC.Controllers
 
         public IActionResult Index()
         {
-            var posts = _postRepository.GetAllPublishedPosts();
+            List<Post> posts = _postRepository.GetAllPublishedPosts();
+
             return View(posts);
+        }
+
+        public IActionResult MyIndex(int id)
+        {
+            List<Post> posts = _postRepository.GetAllPublishedPosts();
+
+            var myPosts = new List<Post>();
+            foreach(Post post in posts)
+            {
+                if (post.UserProfileId == GetCurrentUserId())
+                {
+                    myPosts.Add(post);
+                }       
+            }
+
+            return View(myPosts);
         }
 
         public IActionResult Details(int id)
@@ -73,5 +93,12 @@ namespace TabloidMVC.Controllers
             string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return int.Parse(id);
         }
+
+        private int GetCurrentUserId()
+        {
+            string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return int.Parse(id);
+        }
+
     }
 }

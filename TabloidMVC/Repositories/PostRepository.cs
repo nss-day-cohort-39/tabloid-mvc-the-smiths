@@ -33,7 +33,8 @@ namespace TabloidMVC.Repositories
                               LEFT JOIN Category c ON p.CategoryId = c.id
                               LEFT JOIN UserProfile u ON p.UserProfileId = u.id
                               LEFT JOIN UserType ut ON u.UserTypeId = ut.id
-                        WHERE IsApproved = 1 AND PublishDateTime < SYSDATETIME()";
+                        WHERE IsApproved = 1 AND (PublishDateTime < SYSDATETIME() OR PublishDateTime IS NULL)
+                        ORDER BY p.PublishDateTime DESC";
                     var reader = cmd.ExecuteReader();
 
                     var posts = new List<Post>();
@@ -171,7 +172,7 @@ namespace TabloidMVC.Repositories
                 Content = reader.GetString(reader.GetOrdinal("Content")),
                 ImageLocation = DbUtils.GetNullableString(reader, "HeaderImage"),
                 CreateDateTime = reader.GetDateTime(reader.GetOrdinal("CreateDateTime")),
-                PublishDateTime = DbUtils.GetNullableDateTime(reader,"PublishDateTime"),
+                PublishDateTime = DbUtils.GetNullableDateTime(reader, "PublishDateTime"),
                 CategoryId = reader.GetInt32(reader.GetOrdinal("CategoryId")),
                 Category = new Category()
                 {
