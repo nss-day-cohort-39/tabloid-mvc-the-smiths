@@ -33,7 +33,8 @@ namespace TabloidMVC.Repositories
                               LEFT JOIN Category c ON p.CategoryId = c.id
                               LEFT JOIN UserProfile u ON p.UserProfileId = u.id
                               LEFT JOIN UserType ut ON u.UserTypeId = ut.id
-                        WHERE IsApproved = 1 AND PublishDateTime < SYSDATETIME()";
+                        WHERE IsApproved = 1 AND (PublishDateTime < SYSDATETIME() OR PublishDateTime IS NULL)
+                        ORDER BY p.PublishDateTime DESC";
                     var reader = cmd.ExecuteReader();
 
                     var posts = new List<Post>();
@@ -171,7 +172,7 @@ namespace TabloidMVC.Repositories
                 Content = reader.GetString(reader.GetOrdinal("Content")),
                 ImageLocation = DbUtils.GetNullableString(reader, "HeaderImage"),
                 CreateDateTime = reader.GetDateTime(reader.GetOrdinal("CreateDateTime")),
-                PublishDateTime = DbUtils.GetNullableDateTime(reader,"PublishDateTime"),
+                PublishDateTime = DbUtils.GetNullableDateTime(reader, "PublishDateTime"),
                 CategoryId = reader.GetInt32(reader.GetOrdinal("CategoryId")),
                 Category = new Category()
                 {
@@ -196,6 +197,71 @@ namespace TabloidMVC.Repositories
                     }
                 }
             };
+        }
+
+        public void DeletePost(int postId)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                            DELETE FROM Post
+                            WHERE Id = @id";
+
+                    cmd.Parameters.AddWithValue("@id", postId);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void UpdatePost(Post post)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                               UPDATE Post
+                               SET
+                                    Title = @Title,
+                                    Content = @Content,
+                                    ImageLocation = @ImageLocation,
+                                    PublishDateTime = @PublishDateTime,
+                                    CategoryId = @CategoryId
+                                WHERE Id = @id";
+
+                    cmd.Parameters.AddWithValue("@Title", post.Title);
+                    cmd.Parameters.AddWithValue("@Content", post.Content);
+                    cmd.Parameters.AddWithValue("@CategoryId", post.CategoryId);
+                    cmd.Parameters.AddWithValue("@id", post.Id);
+
+                    if (post.PublishDateTime == null)
+                    {
+                        cmd.Parameters.AddWithValue("@PublishDateTime", DBNull.Value);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@PublishDateTime", post.PublishDateTime);
+                    }
+
+                    if (post.ImageLocation == null)
+                    {
+                        cmd.Parameters.AddWithValue("@ImageLocation", DBNull.Value);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@ImageLocation", post.ImageLocation);
+                    }
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
         }
     }
 }
