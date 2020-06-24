@@ -1,4 +1,9 @@
-﻿namespace TabloidMVC.Models
+﻿using System;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+
+
+namespace TabloidMVC.Models
 {
     public class Category
     {
