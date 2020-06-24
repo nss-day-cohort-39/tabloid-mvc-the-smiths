@@ -39,127 +39,203 @@ namespace TabloidMVC.Repositories
                 }
             }
         }
+        public Tag GetTagById(int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
 
-        //public Post GetPublisedPostById(int id)
-        //{
-        //    using (var conn = Connection)
-        //    {
-        //        conn.Open();
-        //        using (var cmd = conn.CreateCommand())
-        //        {
-        //            cmd.CommandText = @"
-        //               SELECT p.Id, p.Title, p.Content, 
-        //                      p.ImageLocation AS HeaderImage,
-        //                      p.CreateDateTime, p.PublishDateTime, p.IsApproved,
-        //                      p.CategoryId, p.UserProfileId,
-        //                      c.[Name] AS CategoryName,
-        //                      u.FirstName, u.LastName, u.DisplayName, 
-        //                      u.Email, u.CreateDateTime, u.ImageLocation AS AvatarImage,
-        //                      u.UserTypeId, 
-        //                      ut.[Name] AS UserTypeName
-        //                 FROM Post p
-        //                      LEFT JOIN Category c ON p.CategoryId = c.id
-        //                      LEFT JOIN UserProfile u ON p.UserProfileId = u.id
-        //                      LEFT JOIN UserType ut ON u.UserTypeId = ut.id
-        //                WHERE IsApproved = 1 AND PublishDateTime < SYSDATETIME()
-        //                      AND p.id = @id";
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                        SELECT Id, [Name]
+                        FROM Tag
+                        WHERE Id = @id";
 
-        //            cmd.Parameters.AddWithValue("@id", id);
-        //            var reader = cmd.ExecuteReader();
+                    cmd.Parameters.AddWithValue("@id", id);
 
-        //            Post post = null;
+                    SqlDataReader reader = cmd.ExecuteReader();
 
-        //            if (reader.Read())
-        //            {
-        //                post = NewTagFromReader(reader);
-        //            }
+                    if (reader.Read())
+                    {
+                        Tag tag = new Tag()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                        };
 
-        //            reader.Close();
+                        reader.Close();
+                        return tag;
+                    }
 
-        //            return post;
-        //        }
-        //    }
-        //}
+                    reader.Close();
+                    return null;
+                }
+            }
+        }
+        public void UpdateTag(Tag tag)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
 
-        //public Post GetUserPostById(int id, int userProfileId)
-        //{
-        //    using (var conn = Connection)
-        //    {
-        //        conn.Open();
-        //        using (var cmd = conn.CreateCommand())
-        //        {
-        //            cmd.CommandText = @"
-        //               SELECT p.Id, p.Title, p.Content, 
-        //                      p.ImageLocation AS HeaderImage,
-        //                      p.CreateDateTime, p.PublishDateTime, p.IsApproved,
-        //                      p.CategoryId, p.UserProfileId,
-        //                      c.[Name] AS CategoryName,
-        //                      u.FirstName, u.LastName, u.DisplayName, 
-        //                      u.Email, u.CreateDateTime, u.ImageLocation AS AvatarImage,
-        //                      u.UserTypeId, 
-        //                      ut.[Name] AS UserTypeName
-        //                 FROM Post p
-        //                      LEFT JOIN Category c ON p.CategoryId = c.id
-        //                      LEFT JOIN UserProfile u ON p.UserProfileId = u.id
-        //                      LEFT JOIN UserType ut ON u.UserTypeId = ut.id
-        //                WHERE p.id = @id AND p.UserProfileId = @userProfileId";
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                            UPDATE Tag
+                            SET 
+                                [Name] = @name
+                            WHERE Id = @id";
 
-        //            cmd.Parameters.AddWithValue("@id", id);
-        //            cmd.Parameters.AddWithValue("@userProfileId", userProfileId);
-        //            var reader = cmd.ExecuteReader();
+                    cmd.Parameters.AddWithValue("@name", tag.Name);
+                    cmd.Parameters.AddWithValue("@id", tag.Id);
 
-        //            Post post = null;
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+        public void DeleteTag(int tagId)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
 
-        //            if (reader.Read())
-        //            {
-        //                post = NewPostFromReader(reader);
-        //            }
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                                    DELETE FROM Tag
+                                    WHERE Id = @id
+                                ";
 
-        //            reader.Close();
+                    cmd.Parameters.AddWithValue("@id", tagId);
 
-        //            return post;
-        //        }
-        //    }
-        //}
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+ 
 
 
-        //public void Add(Post post)
-        //{
-        //    using (var conn = Connection)
-        //    {
-        //        conn.Open();
-        //        using (var cmd = conn.CreateCommand())
-        //        {
-        //            cmd.CommandText = @"
-        //                INSERT INTO Post (
-        //                    Title, Content, ImageLocation, CreateDateTime, PublishDateTime,
-        //                    IsApproved, CategoryId, UserProfileId )
-        //                OUTPUT INSERTED.ID
-        //                VALUES (
-        //                    @Title, @Content, @ImageLocation, @CreateDateTime, @PublishDateTime,
-        //                    @IsApproved, @CategoryId, @UserProfileId )";
-        //            cmd.Parameters.AddWithValue("@Title", post.Title);
-        //            cmd.Parameters.AddWithValue("@Content", post.Content);
-        //            cmd.Parameters.AddWithValue("@ImageLocation", DbUtils.ValueOrDBNull(post.ImageLocation));
-        //            cmd.Parameters.AddWithValue("@CreateDateTime", post.CreateDateTime);
-        //            cmd.Parameters.AddWithValue("@PublishDateTime", DbUtils.ValueOrDBNull(post.PublishDateTime));
-        //            cmd.Parameters.AddWithValue("@IsApproved", post.IsApproved);
-        //            cmd.Parameters.AddWithValue("@CategoryId", post.CategoryId);
-        //            cmd.Parameters.AddWithValue("@UserProfileId", post.UserProfileId);
+//public Post GetPublisedPostById(int id)
+//{
+//    using (var conn = Connection)
+//    {
+//        conn.Open();
+//        using (var cmd = conn.CreateCommand())
+//        {
+//            cmd.CommandText = @"
+//               SELECT p.Id, p.Title, p.Content, 
+//                      p.ImageLocation AS HeaderImage,
+//                      p.CreateDateTime, p.PublishDateTime, p.IsApproved,
+//                      p.CategoryId, p.UserProfileId,
+//                      c.[Name] AS CategoryName,
+//                      u.FirstName, u.LastName, u.DisplayName, 
+//                      u.Email, u.CreateDateTime, u.ImageLocation AS AvatarImage,
+//                      u.UserTypeId, 
+//                      ut.[Name] AS UserTypeName
+//                 FROM Post p
+//                      LEFT JOIN Category c ON p.CategoryId = c.id
+//                      LEFT JOIN UserProfile u ON p.UserProfileId = u.id
+//                      LEFT JOIN UserType ut ON u.UserTypeId = ut.id
+//                WHERE IsApproved = 1 AND PublishDateTime < SYSDATETIME()
+//                      AND p.id = @id";
 
-        //            post.Id = (int)cmd.ExecuteScalar();
-        //        }
-        //    }
-        //}
+//            cmd.Parameters.AddWithValue("@id", id);
+//            var reader = cmd.ExecuteReader();
 
-        private Tag NewTagFromReader(SqlDataReader reader)
+//            Post post = null;
+
+//            if (reader.Read())
+//            {
+//                post = NewTagFromReader(reader);
+//            }
+
+//            reader.Close();
+
+//            return post;
+//        }
+//    }
+//}
+
+//public Post GetUserPostById(int id, int userProfileId)
+//{
+//    using (var conn = Connection)
+//    {
+//        conn.Open();
+//        using (var cmd = conn.CreateCommand())
+//        {
+//            cmd.CommandText = @"
+//               SELECT p.Id, p.Title, p.Content, 
+//                      p.ImageLocation AS HeaderImage,
+//                      p.CreateDateTime, p.PublishDateTime, p.IsApproved,
+//                      p.CategoryId, p.UserProfileId,
+//                      c.[Name] AS CategoryName,
+//                      u.FirstName, u.LastName, u.DisplayName, 
+//                      u.Email, u.CreateDateTime, u.ImageLocation AS AvatarImage,
+//                      u.UserTypeId, 
+//                      ut.[Name] AS UserTypeName
+//                 FROM Post p
+//                      LEFT JOIN Category c ON p.CategoryId = c.id
+//                      LEFT JOIN UserProfile u ON p.UserProfileId = u.id
+//                      LEFT JOIN UserType ut ON u.UserTypeId = ut.id
+//                WHERE p.id = @id AND p.UserProfileId = @userProfileId";
+
+//            cmd.Parameters.AddWithValue("@id", id);
+//            cmd.Parameters.AddWithValue("@userProfileId", userProfileId);
+//            var reader = cmd.ExecuteReader();
+
+//            Post post = null;
+
+//            if (reader.Read())
+//            {
+//                post = NewPostFromReader(reader);
+//            }
+
+//            reader.Close();
+
+//            return post;
+//        }
+//    }
+//}
+
+
+//public void Add(Post post)
+//{
+//    using (var conn = Connection)
+//    {
+//        conn.Open();
+//        using (var cmd = conn.CreateCommand())
+//        {
+//            cmd.CommandText = @"
+//                INSERT INTO Post (
+//                    Title, Content, ImageLocation, CreateDateTime, PublishDateTime,
+//                    IsApproved, CategoryId, UserProfileId )
+//                OUTPUT INSERTED.ID
+//                VALUES (
+//                    @Title, @Content, @ImageLocation, @CreateDateTime, @PublishDateTime,
+//                    @IsApproved, @CategoryId, @UserProfileId )";
+//            cmd.Parameters.AddWithValue("@Title", post.Title);
+//            cmd.Parameters.AddWithValue("@Content", post.Content);
+//            cmd.Parameters.AddWithValue("@ImageLocation", DbUtils.ValueOrDBNull(post.ImageLocation));
+//            cmd.Parameters.AddWithValue("@CreateDateTime", post.CreateDateTime);
+//            cmd.Parameters.AddWithValue("@PublishDateTime", DbUtils.ValueOrDBNull(post.PublishDateTime));
+//            cmd.Parameters.AddWithValue("@IsApproved", post.IsApproved);
+//            cmd.Parameters.AddWithValue("@CategoryId", post.CategoryId);
+//            cmd.Parameters.AddWithValue("@UserProfileId", post.UserProfileId);
+
+//            post.Id = (int)cmd.ExecuteScalar();
+//        }
+//    }
+//}
+
+private Tag NewTagFromReader(SqlDataReader reader)
         {
             return new Tag()
             {
                 Id = reader.GetInt32(reader.GetOrdinal("Id")),
                 Name = reader.GetString(reader.GetOrdinal("Name")),
-               
-                
+
+
             };
         }
 

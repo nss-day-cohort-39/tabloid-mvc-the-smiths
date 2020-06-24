@@ -58,46 +58,53 @@ namespace TabloidMVC.Controllers
         // GET: Tag/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            Tag tag = _tagRepository.GetTagById(id);
+
+            if (tag == null)
+            {
+                return NotFound();
+            }
+            return View(tag);
         }
 
         // POST: Tag/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(int id, Tag tag)
         {
             try
             {
-                // TODO: Add update logic here
+                _tagRepository.UpdateTag(tag);
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index");
             }
             catch
             {
-                return View();
+                return View(tag);
             }
         }
 
         // GET: Tag/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            Tag tag = _tagRepository.GetTagById(id);
+            return View(tag);
         }
 
         // POST: Tag/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(int id, Tag tag)
         {
             try
             {
-                // TODO: Add delete logic here
+                _tagRepository.DeleteTag(id);
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index");
             }
             catch
             {
-                return View();
+                return View(tag);
             }
         }
     }
