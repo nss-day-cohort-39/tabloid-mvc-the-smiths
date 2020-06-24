@@ -17,11 +17,20 @@ namespace TabloidMVC.Controllers
     {
         private readonly PostRepository _postRepository;
         private readonly CategoryRepository _categoryRepository;
+        private readonly TagRepository _tagRepository;
+        private readonly PostTagRepository _postTagRepository;
+
+
 
         public PostController(IConfiguration config)
         {
             _postRepository = new PostRepository(config);
             _categoryRepository = new CategoryRepository(config);
+            _tagRepository = new TagRepository(config);
+            _postTagRepository = new PostTagRepository(config);
+
+
+
         }
 
         public IActionResult Index()
@@ -153,5 +162,28 @@ namespace TabloidMVC.Controllers
                 return View(post);
             }
         }
+
+        public IActionResult TagManager(int id)
+        {
+            var vm = new PostTagViewModel();
+            vm.Tags = _tagRepository.GetAllTags();
+            vm.Post = _postRepository.GetUserPostById(id, GetCurrentUserProfileId());
+
+            return View(vm);
+        }
+
+        [HttpPost]
+        public IActionResult TagManager(int id, Tag tag )
+        {
+            var postTag = new PostTag()
+            {
+                PostId = id,
+                TagId = tag.Id
+            };
+            _postTagRepository.Add(postTag);
+
+            return View("TagManager");
+        }
+
     }
 }
