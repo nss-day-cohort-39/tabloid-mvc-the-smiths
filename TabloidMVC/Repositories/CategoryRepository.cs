@@ -52,7 +52,7 @@ namespace TabloidMVC.Repositories
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"SELECT id, name 
-                                        FROM Category AND Id = @id";
+                                        FROM Category WHERE Id = @id";
 
                     cmd.Parameters.AddWithValue("@id", id);
                     var reader = cmd.ExecuteReader();
@@ -89,6 +89,23 @@ namespace TabloidMVC.Repositories
                 }
             }
         }
+
+            public void Delete(Category category)
+            {
+                using (var conn = Connection)
+                {
+                    conn.Open();
+                    using (var cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"
+                                DELETE FROM Category
+                                WHERE Id = @id";
+                        cmd.Parameters.AddWithValue("@id", category.Id);
+
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
     }
 }
         
