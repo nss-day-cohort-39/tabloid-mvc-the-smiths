@@ -167,6 +167,7 @@ namespace TabloidMVC.Controllers
         {
             var vm = new PostTagViewModel();
             vm.Tags = _tagRepository.GetAllTags();
+            vm.PostTags = _postTagRepository.GetAllPostTags();
             vm.Post = _postRepository.GetUserPostById(id, GetCurrentUserProfileId());
 
             return View(vm);
@@ -182,7 +183,7 @@ namespace TabloidMVC.Controllers
             };
             _postTagRepository.Add(postTag);
 
-            return View("TagManager");
+            return RedirectToAction("TagManager");
         }
 
     }

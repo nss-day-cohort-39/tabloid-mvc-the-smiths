@@ -19,18 +19,32 @@
     <tbody>
 @foreach (var item in Model.Tags) {
         <tr>
-            
+
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
-          
-            <td>
-                <form asp-action="TagManager" >
-                    <input value="Add" type="submit"  class="btn btn-outline-primary mx-1" title="Add Tag To Post">
-                    <input type="hidden" asp-for="@Model.Tag.Id" value="@item.Id"/>   
-                </form>
-                
-            </td>
+
+            @if (Model.PostTagExists() == false)
+            {
+                <td>
+                    <form asp-action="TagManager">
+                        <input value="Add" type="submit" class="btn btn-outline-primary mx-1" title="Add Tag To Post">
+                        <input type="hidden" asp-for="@Model.Tag.Id" value="@item.Id" />
+                    </form>
+
+                </td>
+            }
+            else
+            {
+                <td>
+                    <form asp-action="TagManager">
+                        <input value="Remove" type="submit" class="btn btn-outline-primary mx-1" title="Add Tag To Post">
+                        <input type="hidden" asp-for="@Model.Tag.Id" value="@item.Id" />
+                    </form>
+
+                </td>
+            }
+
         </tr>
 }
     </tbody>
