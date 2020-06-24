@@ -31,10 +31,7 @@ namespace TabloidMVC.Controllers
         }
 
         // GET: RepositoryController/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
+  
 
         // GET: RepositoryController/Create
         public ActionResult Create()
@@ -45,15 +42,17 @@ namespace TabloidMVC.Controllers
         // POST: RepositoryController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(Category category)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+
+                _categoryRepository.Add(category);
+                return RedirectToAction("Index");
             }
             catch
             {
-                return View();
+                return View(category);
             }
         }
 
