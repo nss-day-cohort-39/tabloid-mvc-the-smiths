@@ -59,21 +59,29 @@ namespace TabloidMVC.Controllers
         // GET: RepositoryController/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            var category = _categoryRepository.GetCategoryById(id);
+            
+            if (category == null)
+            {
+                return RedirectToAction("Index");
+            }
+            return View(category);
         }
 
         // POST: RepositoryController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(int id, Category category)
         {
             try
             {
+                _categoryRepository.UpdateCategory(category);
+                
                 return RedirectToAction(nameof(Index));
             }
             catch
             {
-                return View();
+                return View(category);
             }
         }
 
@@ -104,6 +112,7 @@ namespace TabloidMVC.Controllers
             {
                 return View(category);
             }
+
         }
     }
 }
