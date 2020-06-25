@@ -186,5 +186,17 @@ namespace TabloidMVC.Controllers
             return RedirectToAction("TagManager");
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult TagManageDelete(int id, Tag tag)
+        {
+                PostTag postTag = _postTagRepository.GetPostTagByPostIdAndTagId(id, tag.Id);
+
+                _postTagRepository.DeletePostTag(postTag.Id);
+
+                return RedirectToAction("TagManager", new { id = id });
+           
+        }
+
     }
 }
