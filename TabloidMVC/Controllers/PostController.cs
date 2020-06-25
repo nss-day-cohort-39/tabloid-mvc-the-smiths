@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualBasic;
@@ -58,17 +59,20 @@ namespace TabloidMVC.Controllers
 
         public IActionResult Details(int id)
         {
-            var post = _postRepository.GetPublisedPostById(id);
-            if (post == null)
+            var vm = new PostDeatailsViewModel();
+            vm.Tags = _tagRepository.GetTagsForThePost(id);
+            vm.Post = _postRepository.GetPublisedPostById(id);
+            
+            if (vm.Post == null)
             {
                 int userId = GetCurrentUserProfileId();
-                post = _postRepository.GetUserPostById(id, userId);
-                if (post == null)
+                vm.Post = _postRepository.GetUserPostById(id, userId);
+                if (vm.Post == null)
                 {
                     return NotFound();
                 }
             }
-            return View(post);
+            return View(vm);
         }
 
         public IActionResult Create()

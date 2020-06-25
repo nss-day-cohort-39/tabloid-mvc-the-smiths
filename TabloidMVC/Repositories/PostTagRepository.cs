@@ -42,6 +42,36 @@ namespace TabloidMVC.Repositories
             }
         }
 
+        public List<PostTag> GetPostTagsByPostId(int id)
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                       SELECT Id, PostId, TagId
+                         FROM PostTag
+                         WHERE PostId = @postId";
+
+                    cmd.Parameters.AddWithValue("@postId", id);
+
+                    var reader = cmd.ExecuteReader();
+
+                    var postTags = new List<PostTag>();
+
+                    while (reader.Read())
+                    {
+                        postTags.Add(NewPostTagFromReader(reader));
+                    }
+
+                    reader.Close();
+
+                    return postTags;
+                }
+            }
+        }
+
 
         private PostTag NewPostTagFromReader(SqlDataReader reader)
         {
