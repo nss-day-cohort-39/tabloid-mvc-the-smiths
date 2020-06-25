@@ -7,12 +7,6 @@ namespace TabloidMVC.Models
 {
     public class Comment
     {
-        internal int id;
-        internal string subject;
-        internal string content;
-        internal int userprofileid;
-        internal DateTime createdatetime;
-
         public int Id { get; set; }
         public int PostId { get; set; }
         public Post post { get; set; }
