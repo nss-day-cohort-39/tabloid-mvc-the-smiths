@@ -23,8 +23,8 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
-
-            @if (Model.PostTagExists() == false)
+          
+            @if(Model.PostTags.Exists((pT) => pT.PostId == Model.Post.Id && pT.TagId == item.Id) == false)
             {
                 <td>
                     <form asp-action="TagManager">

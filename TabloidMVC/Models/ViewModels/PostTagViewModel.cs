@@ -11,16 +11,18 @@ namespace TabloidMVC.Models.ViewModels
         public Tag Tag { get; set; }
         public List<Tag> Tags { get; set; }
         public List<PostTag> PostTags { get; set; }
-        public Boolean PostTagExists()
-        {
+        //public Boolean PostTagExists()
+        //{
 
-           //foreach(Tag tag in Tags)
-           // {
-           //     return PostTags.Exists((pT) => pT.PostId == Post.Id && pT.TagId == tag.Id);
-           // }
-          return PostTags.Exists((pT) => pT.PostId == Post.Id && pT.TagId == Tag.Id);
-         
-        }
+        //   //foreach(Tag tag in Tags)
+        //   // {
+        //   //     return PostTags.Exists((pT) => pT.PostId == Post.Id && pT.TagId == tag.Id);
+        //   // }
+        //  //return PostTags.Exists((pT) => pT.PostId == Post.Id && pT.TagId == Tag.Id);
+        //  //  @if(Model.PostTagExists() == false)
+
+
+        //}
 
     }
 }
