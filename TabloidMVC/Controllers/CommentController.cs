@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using TabloidMVC.Models;
 using TabloidMVC.Repositories;
 
@@ -12,10 +13,14 @@ namespace TabloidMVC.Controllers
     public class CommentController : Controller
     {
         private readonly CommentRepository _commentRepo;
+        public CommentController(IConfiguration config)
+        {
+            _commentRepo = new CommentRepository(config);
+        }
         // GET: CommentController
-        public ActionResult Index()
+        public ActionResult Index(int id)
             {
-                List<Comment> comments = _commentRepo.getall();
+                List<Comment> comments = _commentRepo.GetCommentsByPostId(id);
                 return View(comments);
             }
   

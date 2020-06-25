@@ -46,10 +46,7 @@ namespace TabloidMVC.Repositories
             }
         }
 
-        internal List<Comment> GetAllComments()
-        {
-            throw new NotImplementedException();
-        }
+    
 
         public Comment GetCommentById(int id)
         {
@@ -90,8 +87,9 @@ namespace TabloidMVC.Repositories
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                SELECT Id, UserProfileId, Subject, Content, CreateDateTime 
-                FROM Comment
+                SELECT c.Id, c.UserProfileId, c.PostId, c.Subject, c.Content, c.CreateDateTime, p.Id 
+                FROM Comment c
+                LEFT JOIN Post p ON c.PostId = p.Id
                 WHERE PostId = @postId";
                     cmd.Parameters.AddWithValue("@postId", postId);
                     SqlDataReader reader = cmd.ExecuteReader();
@@ -104,6 +102,7 @@ namespace TabloidMVC.Repositories
                             Subject = reader.GetString(reader.GetOrdinal("Subject")),
                             Content = reader.GetString(reader.GetOrdinal("Content")),
                             UserProfileId = reader.GetInt32(reader.GetOrdinal("UserProfileId")),
+                            PostId = reader.GetInt32(reader.GetOrdinal("PostId")),
                             CreateDateTime = reader.GetDateTime(reader.GetOrdinal("CreateDateTime"))
                         };
 
