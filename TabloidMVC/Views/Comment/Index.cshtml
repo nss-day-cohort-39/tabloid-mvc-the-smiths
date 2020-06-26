@@ -4,7 +4,7 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Comments</h1>
 
 <p>
     <a asp-action="Create" asp-route-id="@Model.Post.Id">Create New</a>
@@ -63,3 +63,7 @@
 }
     </tbody>
 </table>
+
+<a asp-controller="Post" asp-action="Details" asp-route-id="@Model.Post.Id" class="btn btn-outline-primary mx-1" title="Tag Manager">
+    Back
+</a>
