@@ -65,46 +65,63 @@ namespace TabloidMVC.Controllers
         }
 
         // GET: CommentController/Edit/5
-        public ActionResult Edit(int id)
+        public IActionResult Edit(int id)
         {
-            return View();
+            var comment = _commentRepo.GetCommentById(id);
+
+            if (comment == null || comment.UserProfileId != GetCurrentUserProfileId())
+            {
+                return RedirectToAction("Index");
+            }
+            return View(comment);
         }
 
         // POST: CommentController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public IActionResult Edit(int id, Comment comment)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                _commentRepo.UpdateComment(comment);
+
+                return RedirectToAction("Index", new { id = comment.PostId });
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                return View(comment);
             }
         }
 
         // GET: CommentController/Delete/5
-        public ActionResult Delete(int id)
+        public IActionResult Delete(int id)
         {
-            return View();
+            var comment = _commentRepo.GetCommentById(id);
+
+            if (comment == null || comment.UserProfileId != GetCurrentUserProfileId())
+            {
+                return NotFound();
+            }
+
+            return View(comment);
         }
 
         // POST: CommentController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public IActionResult Delete(int id, Comment comment)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                _commentRepo.DeleteComment(comment);
+                return RedirectToAction("Index", new { id = comment.PostId });
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                return View(comment);
             }
         }
+
         private int GetCurrentUserProfileId()
         {
             string id = User.FindFirstValue(ClaimTypes.NameIdentifier);

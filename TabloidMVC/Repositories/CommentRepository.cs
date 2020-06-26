@@ -46,7 +46,7 @@ namespace TabloidMVC.Repositories
             }
         }
 
-    
+
 
         public Comment GetCommentById(int id)
         {
@@ -55,8 +55,20 @@ namespace TabloidMVC.Repositories
                 conn.Open();
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT Id, Subject, Content, UserProfileId, CreationDateTime
-                                        FROM Comment WHERE Id = @id";
+                    cmd.CommandText = @"
+                       SELECT c.Id, c.PostId, c.UserProfileId, 
+                              c.Subject, c.Content, c.CreateDateTime,
+                              p.Title, p.Content,
+                              p.ImageLocation AS HeaderImage,
+                              p.CreateDateTime, p.PublishDateTime, p.IsApproved,
+                              p.CategoryId, p.UserProfileId,
+                              u.FirstName, u.LastName, u.DisplayName, 
+                              u.Email, u.CreateDateTime, u.ImageLocation AS AvatarImage,
+                              u.UserTypeId 
+                         FROM Comment c
+                              LEFT JOIN Post p ON c.PostId = p.id
+                              LEFT JOIN UserProfile u ON c.UserProfileId = u.id
+                              WHERE c.id = @id";
 
                     cmd.Parameters.AddWithValue("@id", id);
                     var reader = cmd.ExecuteReader();
@@ -67,9 +79,10 @@ namespace TabloidMVC.Repositories
                     {
                         comment = new Comment();
                         comment.Id = reader.GetInt32(reader.GetOrdinal("Id"));
+                        comment.PostId = reader.GetInt32(reader.GetOrdinal("PostId"));
+                        comment.UserProfileId = reader.GetInt32(reader.GetOrdinal("UserProfileId"));
                         comment.Subject = reader.GetString(reader.GetOrdinal("Subject"));
                         comment.Content = reader.GetString(reader.GetOrdinal("Content"));
-                        comment.UserProfileId = reader.GetInt32(reader.GetOrdinal("UserProfileId"));
                         comment.CreateDateTime = reader.GetDateTime(reader.GetOrdinal("CreateDateTime"));
                     }
 
@@ -139,40 +152,46 @@ namespace TabloidMVC.Repositories
                 }
             }
         }
+
+        public void DeleteComment(Comment comment)
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                                DELETE FROM Comment
+                                WHERE Id = @id";
+                    cmd.Parameters.AddWithValue("@id", comment.Id);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void UpdateComment(Comment comment)
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                               UPDATE Comment
+                               SET
+                                    Subject = @subject,
+                                    Content = @content
+                               WHERE Id = @id";
+
+                    cmd.Parameters.AddWithValue("@subject", comment.Subject);
+                    cmd.Parameters.AddWithValue("@content", comment.Content);
+                    cmd.Parameters.AddWithValue("@id", comment.Id);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
     }
 }
-
-            //public List<Comment> GetCommentsByPostId(int postId)
-            //{
-            //    using (var conn = Connection)
-            //    {
-            //        conn.Open();
-            //        using (var cmd = conn.CreateCommand())
-            //        {
-            //            cmd.CommandText = @"SELECT
-            //                c.Id,
-            //                c.PostId,
-            //                c.UserProfileId,
-            //                c.Subject,
-            //                c.Content,
-            //                c.CreateDateTime
-            //            FROM Comment c
-            //            JOIN Post p ON c.PostId = p.Id
-            //            WHERE p.Id = @postId";
-
-//            cmd.Parameters.AddWithValue("@postId", postId);
-//            var reader = cmd.ExecuteReader();
-//            var comments = new List<Comment>();
-
-//            while (reader.Read())
-//            {
-//                comments.Add(NewCommentFromReader(reader));
-//            }
-
-//            reader.Close();
-//            return comments;
-//        }
-//    }
-//}
-
-
