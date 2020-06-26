@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
 using TabloidMVC.Models;
 using TabloidMVC.Utils;
 
@@ -7,6 +9,55 @@ namespace TabloidMVC.Repositories
     public class UserProfileRepository : BaseRepository
     {
         public UserProfileRepository(IConfiguration config) : base(config) { }
+
+        public List<UserProfile> GetAllUserProfiles()
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                       SELECT uP.Id,
+                              uP.DisplayName,
+                              uP.FirstName,
+                              uP.LastName,
+                              uP.UserTypeId,
+                              uT.Name AS UserTypeName
+                         FROM UserProfile uP
+                         JOIN UserType uT ON uP.UserTypeId = uT.Id
+                         ORDER BY DisplayName;";
+                    var reader = cmd.ExecuteReader();
+
+                    var userProfiles = new List<UserProfile>();
+
+                    while (reader.Read())
+                    {
+                        UserProfile userProfile = new UserProfile
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            DisplayName = reader.GetString(reader.GetOrdinal("DisplayName")),
+                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                            UserTypeId = reader.GetInt32(reader.GetOrdinal("UsertypeId")),
+                            UserType = new UserType()
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("UsertypeId")),
+                                Name = reader.GetString(reader.GetOrdinal("UserTypeName"))
+                            }
+                        };
+
+                        userProfiles.Add(userProfile);
+                    }
+
+                    reader.Close();
+
+                    return userProfiles;
+                }
+            }
+        }
+
+       
 
         public UserProfile GetByEmail(string email)
         {
