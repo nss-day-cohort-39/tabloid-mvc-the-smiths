@@ -1,0 +1,55 @@
+﻿@model TabloidMVC.Models.ViewModels.PostTagViewModel
+
+@{
+    ViewData["Title"] = "Tag Manager";
+}
+
+<h1>Tag Manager</h1>
+
+<a asp-action="Details" asp-route-id="@Model.Post.Id" class="btn btn-outline-primary mx-1" title="Tag Manager">
+    Back
+</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            
+            <th>
+                @Html.DisplayNameFor(model => model.Tag.Name)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Tags) {
+        <tr>
+
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+          
+            @if(Model.PostTags.Exists((pT) => pT.PostId == Model.Post.Id && pT.TagId == item.Id) == false)
+            {
+                <td>
+                    <form asp-action="TagManager">
+                        <input value="Add" type="submit" class="btn btn-outline-primary mx-1" title="Add Tag To Post">
+                        <input type="hidden" asp-for="@Model.Tag.Id" value="@item.Id" />
+                    </form>
+
+                </td>
+            }
+            else
+            {
+                <td>
+                    <form asp-action="TagManageDelete" asp-route-id="@Model.Post.Id">
+                        <input value="Remove" type="submit" class="btn btn-outline-primary mx-1" title="Add Tag To Post">
+                        <input type="hidden" asp-for="@Model.Tag.Id" value="@item.Id" />
+                    </form>
+
+                </td>
+            }
+
+        </tr>
+}
+    </tbody>
+</table>
